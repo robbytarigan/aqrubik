@@ -1,0 +1,821 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Manos.IO</name>
+    </assembly>
+    <members>
+        <member name="T:Manos.IO.Stream">
+            <summary>
+            Base class for asynchronous streams. Other than synchronous streams,
+            asynchronous streams do not block calls to their Read or Write methods.
+            <para>Calls to Read replace the current set of reader callbacks (which need
+            not yet exist) with a new set of callbacks. These callbacks are invoked
+            whenever the corresponding event occured.</para>
+            <para>Calls to Write place the data to be written into a write queue.
+            Whenever the stream becomes writeable, data from the queue is written.</para>
+            <para>The reading and writing parts of the stream may be paused and resumed
+            individually. Pausing and resuming is a set-reset process, so multiple
+            calls to Pause methods can be undone by a single call to a Resume method.</para>
+            </summary>
+        </member>
+        <member name="M:Manos.IO.Stream.#ctor(Manos.IO.Context)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Manos.IO.Stream"/> class.
+            </summary>
+            <param name="context">
+            The context this instance will be bound to.
+            </param>
+        </member>
+        <member name="M:Manos.IO.Stream.CancelReader">
+            <summary>
+            Cancels the current reader and clears the set of reader callbacks.
+            </summary>
+        </member>
+        <member name="M:Manos.IO.Stream.Read(System.Action{Manos.IO.ByteBuffer},System.Action{System.Exception},System.Action)">
+            <summary>
+            Replaces the current set of reader callbacks with the given set of reader callbacks.
+            The returned value may be used to indicate that no further callback invocations should
+            occur.
+            </summary>
+            <exception cref="T:System.ArgumentNullException">
+            Is thrown when any argument passed to the method is <see langword="null"/> .
+            </exception>
+        </member>
+        <member name="M:Manos.IO.Stream.Write(System.Collections.Generic.IEnumerable{Manos.IO.ByteBuffer})">
+            <summary>
+            Places a sequence of buffers into the write queue.
+            The sequence is not touched, only when the first piece of data in the
+            sequence may be written to the stream, the enumeration is started.
+            This allows for data generators that produce large amounts of data, but
+            have a very small memory footprint.
+            <para>The sequence may return an arbitrary number of byte buffers.</para>
+            <para>Byte buffers of length 0 are interpreted literally, as writes
+            of length 0. Writing continues after the buffer has been written, unless the
+            stream has become congested.</para>
+            <para><c>null</c> byte buffers pause writing.</para>
+            </summary>
+            <exception cref="T:System.ArgumentNullException">
+            Is thrown when an argument passed to a method is invalid because it is <see langword="null"/> .
+            </exception>
+        </member>
+        <member name="M:Manos.IO.Stream.Write(Manos.IO.ByteBuffer)">
+            <summary>
+            Places a single buffer into the write queue.
+            </summary>
+        </member>
+        <member name="M:Manos.IO.Stream.Write(System.Byte[])">
+            <summary>
+            Places a single byte array into the write queue.
+            </summary>
+        </member>
+        <member name="M:Manos.IO.Stream.Finalize">
+            <summary>
+            Releases unmanaged resources and performs other cleanup operations before the <see cref="T:Manos.IO.Stream"/> is
+            reclaimed by garbage collection.
+            </summary>
+        </member>
+        <member name="M:Manos.IO.Stream.ResumeReading">
+            <summary>
+            Instructs the stream to resume reading when it is not reading yet.
+            </summary>
+        </member>
+        <member name="M:Manos.IO.Stream.ResumeReading(System.Int64)">
+            <summary>
+            Instructs the stream to resume reading when it is not reading yet.
+            After <paramref name="forBytes"/> bytes have been read, the stream
+            automatically pauses itself again.
+            </summary>
+        </member>
+        <member name="M:Manos.IO.Stream.ResumeWriting">
+            <summary>
+            Resumes writing.
+            </summary>
+        </member>
+        <member name="M:Manos.IO.Stream.PauseReading">
+            <summary>
+            Pauses reading.
+            </summary>
+        </member>
+        <member name="M:Manos.IO.Stream.PauseWriting">
+            <summary>
+            Pauses writing.
+            </summary>
+        </member>
+        <member name="M:Manos.IO.Stream.SeekBy(System.Int64)">
+            <summary>
+            Seeks by <paramref name="delta"/> bytes. A positive <paramref name="delta"/>
+            will seek forward, a negative <paramref name="delta"/> will seek backwards.
+            </summary>
+        </member>
+        <member name="M:Manos.IO.Stream.SeekTo(System.Int64)">
+            <summary>
+            Seeks to absolute position <paramref name="position"/> in the stream.
+            </summary>
+        </member>
+        <member name="M:Manos.IO.Stream.Flush">
+            <summary>
+            Flush all buffers held by this instance, if applicable. This need not
+            flush the write queue, it must however place equivalents for all
+            semantically written data into the write queue.
+            <para>For example, a block cipher stream might operate an 16 byte blocks.
+            A call to <see cref="M:Manos.IO.Stream.Flush"/> on this stream would pad an incomplete block
+            to 16 bytes, encrypt it, and queue it for writing.</para>
+            </summary>
+        </member>
+        <member name="M:Manos.IO.Stream.Close">
+            <summary>
+            Close this instance. The currently active reader is cancelled,
+            the write queue is cleared.
+            </summary>
+        </member>
+        <member name="M:Manos.IO.Stream.Dispose">
+            <summary>
+            Releases all resource used by the <see cref="T:Manos.IO.Stream"/> object.
+            </summary>
+            <remarks>
+            Call <see cref="M:Manos.IO.Stream.Dispose"/> when you are finished using the <see cref="T:Manos.IO.Stream"/>. The
+            <see cref="M:Manos.IO.Stream.Dispose"/> method leaves the <see cref="T:Manos.IO.Stream"/> in an unusable state. After calling
+            <see cref="M:Manos.IO.Stream.Dispose"/>, you must release all references to the <see cref="T:Manos.IO.Stream"/> so the garbage
+            collector can reclaim the memory that the <see cref="T:Manos.IO.Stream"/> was occupying.
+            </remarks>
+        </member>
+        <member name="M:Manos.IO.Stream.Dispose(System.Boolean)">
+            <summary>
+            Dispose the current instance.
+            </summary>
+            <param name="disposing">
+            <c>true</c>, if the method was called by <see cref="M:Manos.IO.Stream.Dispose"/>,
+            <c>false</c> if it was called from a finalizer.
+            </param>
+        </member>
+        <member name="M:Manos.IO.Stream.RaiseData(Manos.IO.ByteBuffer)">
+            <summary>
+            Raises the data callback, if set.
+            </summary>
+        </member>
+        <member name="M:Manos.IO.Stream.RaiseError(System.Exception)">
+            <summary>
+            Raises the error callback, if set.
+            </summary>
+        </member>
+        <member name="M:Manos.IO.Stream.RaiseEndOfStream">
+            <summary>
+            Raises the end of stream callback, if set.
+            </summary>
+        </member>
+        <member name="M:Manos.IO.Stream.WriteSingleBuffer(Manos.IO.ByteBuffer)">
+            <summary>
+            Writes a single buffer to the stream. Must return a positive value or <c>0</c>
+            for successful writes, and a negative value for unsuccessful writes.
+            Unsuccessful write pause the writing process, successful writes consume the
+            returned number of bytes from the write queue.
+            </summary>
+            <returns>
+            The number of bytes written, or a negative value on unsuccessful write.
+            </returns>
+        </member>
+        <member name="M:Manos.IO.Stream.HandleWrite">
+            <summary>
+            Handles one write operation. If the write queue is empty, or the buffer
+            produced by the currently writing sequence is <c>null</c>, the writing
+            process is paused.
+            </summary>
+        </member>
+        <member name="M:Manos.IO.Stream.WriteCurrentBuffer">
+            <summary>
+            Writes the current buffer to the stream via <see cref="M:Manos.IO.Stream.WriteSingleBuffer(Manos.IO.ByteBuffer)"/>.
+            A non-negative value returned by <see cref="M:Manos.IO.Stream.WriteSingleBuffer(Manos.IO.ByteBuffer)"/> consumes that
+            number of bytes from the write queue, a negative value pauses the writing
+            process.
+            </summary>
+        </member>
+        <member name="M:Manos.IO.Stream.EnsureActiveBuffer">
+            <summary>
+            Ensures that a buffer to be written to the stream exists.
+            </summary>
+            <returns>
+            <c>true</c>, iff there is a buffer that can be written to the stream.
+            </returns>
+        </member>
+        <member name="M:Manos.IO.Stream.EnsureActiveWriter">
+            <summary>
+            Ensures that a sequence to be written to the stream exists.
+            </summary>
+            <returns>
+            <c>true</c>, iff there is a sequence that can be written to the stream.
+            </returns>
+        </member>
+        <member name="P:Manos.IO.Stream.Context">
+            <summary>
+            Gets the context this stream is bound to.
+            </summary>
+        </member>
+        <member name="P:Manos.IO.Stream.Position">
+            <summary>
+            Gets or sets the position.
+            </summary>
+        </member>
+        <member name="P:Manos.IO.Stream.CanRead">
+            <summary>
+            Gets a value indicating whether this instance can read.
+            </summary>
+            <value>
+            <c>true</c> if this instance can read; otherwise, <c>false</c>.
+            </value>
+        </member>
+        <member name="P:Manos.IO.Stream.CanWrite">
+            <summary>
+            Gets a value indicating whether this instance can write.
+            </summary>
+            <value>
+            <c>true</c> if this instance can write; otherwise, <c>false</c>.
+            </value>
+        </member>
+        <member name="P:Manos.IO.Stream.CanSeek">
+            <summary>
+            Gets a value indicating whether this instance can seek.
+            </summary>
+            <value>
+            <c>true</c> if this instance can seek; otherwise, <c>false</c>.
+            </value>
+        </member>
+        <member name="P:Manos.IO.Stream.CanTimeout">
+            <summary>
+            Gets a value indicating whether this instance can timeout.
+            </summary>
+            <value>
+            <c>true</c> if this instance can timeout; otherwise, <c>false</c>.
+            </value>
+        </member>
+        <member name="P:Manos.IO.Stream.ReadTimeout">
+            <summary>
+            Gets or sets the read timeout.
+            </summary>
+        </member>
+        <member name="P:Manos.IO.Stream.WriteTimeout">
+            <summary>
+            Gets or sets the write timeout.
+            </summary>
+        </member>
+        <member name="T:Manos.IO.Stream.ReaderHandle">
+            <summary>
+            A <see cref="T:Manos.IO.Stream.ReaderHandle"/> represents a stream users' handle on the
+            set of reader callbacks. If the user wishes to not receive further
+            callbacks, he must call <see cref="M:Manos.IO.Stream.ReaderHandle.Dispose"/> on the handle to cancel
+            his set of callbacks.
+            </summary>
+        </member>
+        <member name="M:Manos.IO.Stream.ReaderHandle.#ctor(Manos.IO.Stream)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Manos.IO.Stream.ReaderHandle"/> class.
+            </summary>
+        </member>
+        <member name="M:Manos.IO.Stream.ReaderHandle.Dispose">
+            <summary>
+            Cancels the set of reader callbacks in the parent.
+            </summary>
+        </member>
+        <member name="T:Manos.IO.ByteBuffer">
+            <summary>
+            Byte buffers are used avoid expensive array copy operations when
+            only parts of an array are valid.
+            </summary>
+        </member>
+        <member name="M:Manos.IO.ByteBuffer.#ctor(System.Byte[],System.Int32,System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Manos.IO.ByteBuffer"/> class.
+            </summary>
+        </member>
+        <member name="M:Manos.IO.ByteBuffer.ReadByte">
+            <summary>
+            Reads and consumes one byte from the buffer. This method is mostly equivalent to
+            copying <see cref="P:Manos.IO.ByteBuffer.CurrentByte"/> and skipping one byte with <see cref="M:Manos.IO.ByteBuffer.Skip(System.Int32)"/>.
+            </summary>
+            <returns>
+            The byte.
+            </returns>
+            <exception cref="T:System.InvalidOperationException">
+            Is thrown when no more bytes are left to read.
+            </exception>
+        </member>
+        <member name="M:Manos.IO.ByteBuffer.Skip(System.Int32)">
+            <summary>
+            Consumes <see cref="F:Manos.IO.ByteBuffer.bytes"/> bytes of valid data by advancing <see cref="P:Manos.IO.ByteBuffer.Position"/>
+            and decreasing <see cref="P:Manos.IO.ByteBuffer.Length"/>.
+            </summary>
+            <param name="bytes">
+            Number of bytes to skip.
+            </param>
+            <exception cref="T:System.ArgumentException">
+            When <see cref="F:Manos.IO.ByteBuffer.bytes"/> is less than <c>0</c>, or greater than the remaining amount
+            of data in the valid segment.
+            </exception>
+        </member>
+        <member name="P:Manos.IO.ByteBuffer.CurrentByte">
+            <summary>
+            Gets the byte at position <see cref="P:Manos.IO.ByteBuffer.Position"/> in
+            <see cref="P:Manos.IO.ByteBuffer.Bytes"/>.
+            </summary>
+        </member>
+        <member name="P:Manos.IO.ByteBuffer.Bytes">
+            <summary>
+            Gets the byte array wrapped by this instance.
+            </summary>
+        </member>
+        <member name="P:Manos.IO.ByteBuffer.Length">
+            <summary>
+            Gets the length of the segment of valid data within <see cref="P:Manos.IO.ByteBuffer.Bytes"/>.
+            This length may be <c>0</c>.
+            </summary>
+        </member>
+        <member name="P:Manos.IO.ByteBuffer.Position">
+            <summary>
+            Gets the position at which the segment of valid data within <see cref="P:Manos.IO.ByteBuffer.Bytes"/>
+            starts, i.e. the first valid byte.
+            </summary>
+        </member>
+        <member name="T:Manos.IO.Socket">
+            <summary>
+            Abstract base class for sockets bound to event loops.
+            </summary>
+            <exception cref="T:System.InvalidOperationException">
+            Is thrown when an operation cannot be performed.
+            </exception>
+        </member>
+        <member name="F:Manos.IO.Socket.state">
+            <summary>
+            The state of the socket. This should initially be
+            <see cref="F:Manos.IO.Socket.SocketState.Invalid"/>.
+            </summary>
+        </member>
+        <member name="F:Manos.IO.Socket.address">
+            <summary>
+            The address of the peer for open sockets, the address of the
+            local socket for listening sockets.
+            </summary>
+        </member>
+        <member name="F:Manos.IO.Socket.port">
+            <summary>
+            The port of the peer for open sockets, the port of the
+            local socket for listening sockets.
+            </summary>
+        </member>
+        <member name="M:Manos.IO.Socket.#ctor(Manos.IO.Context)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Manos.IO.Socket"/> class.
+            </summary>
+            <param name="context">
+            The context this socket will be bound to.
+            </param>
+        </member>
+        <member name="M:Manos.IO.Socket.GetSocketStream">
+            <summary>
+            Gets the socket stream associated with the current socket.
+            This stream will be bound to the event loop the current socket
+            is bound to.
+            </summary>
+            <returns>
+            The socket stream.
+            </returns>
+        </member>
+        <member name="M:Manos.IO.Socket.Connect(System.String,System.Int32,System.Action)">
+            <summary>
+            Connect to the specified host at the specified port.
+            Invoke <paramref name="callback"/> when the connection is established.
+            </summary>
+            <param name="host">
+            Host to connect to. This should be an IP address.
+            </param>
+            <param name="port">
+            Port to connect to.
+            </param>
+            <param name="callback">
+            Callback to invoke when the connection is established. May be <c>null</c>.
+            </param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="host"/> is <c>null</c> or empty, or <paramref name="port"/>
+            is not larger than <c>0</c>.</exception>
+        </member>
+        <member name="M:Manos.IO.Socket.Listen(System.String,System.Int32,System.Action{Manos.IO.Socket})">
+            <summary>
+            Listen at the specified address under the specified port.
+            Invoke <paramref name="callback"/> for every connection that has been
+            accepted.
+            </summary>
+            <param name="host">
+            Host to listen at. This should be an IP address.
+            </param>
+            <param name="port">
+            Port to listen at.
+            </param>
+            <param name="callback">
+            Callback to invoke for every accepted connection.
+            </param>
+            <exception cref="T:System.ArgumentException">
+            <paramref name="host"/> is <c>null</c> or empty,
+            <paramref name="port"/> is not larger than <c>0</c>,
+            or <paramref name="callback"/> is null.</exception>
+        </member>
+        <member name="M:Manos.IO.Socket.Finalize">
+            <summary>
+            Releases unmanaged resources and performs other cleanup operations before the <see cref="T:Manos.IO.Socket"/> is
+            reclaimed by garbage collection.
+            </summary>
+        </member>
+        <member name="M:Manos.IO.Socket.Close">
+            <summary>
+            Closes this instance and releases all resources associated with it.
+            </summary>
+        </member>
+        <member name="M:Manos.IO.Socket.Dispose">
+            <summary>
+            Releases all resource used by the <see cref="T:Manos.IO.Socket"/> object.
+            </summary>
+            <remarks>
+            Call <see cref="M:Manos.IO.Socket.Dispose"/> when you are finished using the <see cref="T:Manos.IO.Socket"/>. The
+            <see cref="M:Manos.IO.Socket.Dispose"/> method leaves the <see cref="T:Manos.IO.Socket"/> in an unusable state. After calling
+            <see cref="M:Manos.IO.Socket.Dispose"/>, you must release all references to the <see cref="T:Manos.IO.Socket"/> so the garbage
+            collector can reclaim the memory that the <see cref="T:Manos.IO.Socket"/> was occupying.
+            </remarks>
+        </member>
+        <member name="M:Manos.IO.Socket.Dispose(System.Boolean)">
+            <summary>
+            Dispose the current instance.
+            </summary>
+            <param name="disposing">
+            <c>true</c>, if the method was called by <see cref="M:Manos.IO.Socket.Dispose"/>,
+            <c>false</c> if it was called from a finalizer.
+            </param>
+        </member>
+        <member name="P:Manos.IO.Socket.Address">
+            <summary>
+            The address of the peer for open sockets, the address of the
+            local socket for listening sockets.
+            </summary>
+            <exception cref="T:System.InvalidOperationException">
+            Is thrown when the socket is neither connected nor listening.
+            </exception>
+        </member>
+        <member name="P:Manos.IO.Socket.Port">
+            <summary>
+            The port of the peer for open sockets, the port of the
+            local socket for listening sockets.
+            </summary>
+            <exception cref="T:System.InvalidOperationException">
+            Is thrown when the socket is neither connected nor listening.
+            </exception>
+        </member>
+        <member name="P:Manos.IO.Socket.Context">
+            <summary>
+            Gets the context this socket is bound to.
+            </summary>
+        </member>
+        <member name="T:Manos.IO.Socket.SocketState">
+            <summary>
+            States a socket must support. More states may be supported
+            by specific implementations.
+            </summary>
+        </member>
+        <member name="F:Manos.IO.Socket.SocketState.Invalid">
+            <summary>
+            The socket is not connected to any peer.
+            </summary>
+        </member>
+        <member name="F:Manos.IO.Socket.SocketState.Listening">
+            <summary>
+            The socket is waiting for connections.
+            </summary>
+        </member>
+        <member name="F:Manos.IO.Socket.SocketState.Open">
+            <summary>
+            The socket has established a connection to a peer.
+            </summary>
+        </member>
+        <member name="T:Manos.IO.ISendfileCapable">
+            <summary>
+            Marks a stream as sendfile-capable, i.e. the streams supports
+            efficient methods to write the contents of a given file to
+            the stream.
+            </summary>
+        </member>
+        <member name="M:Manos.IO.ISendfileCapable.SendFile(System.String)">
+            <summary>
+            Sends a file to the stream efficiently.
+            </summary>
+            <param name='file'>
+            Name of the file to send.
+            </param>
+        </member>
+        <member name="T:Manos.IO.IBaseWatcher">
+            <summary>
+            Watchers represent a subscription to an event that can be active (started)
+            or inactive (stopped).
+            Each watcher instance manages a unique subscription, independent of all other
+            watcher instances.
+            <para>After the event has occured, the watcher callback is invoked
+            at least once. Occurences of the watched event and callback invocations
+            need not be 1-to-1, depending on the concrete watcher.</para>
+            <para>Callbacks are only invoked for started watchers.</para>
+            <remarks>Generally, operations on watchers are not thread-safe.</remarks>
+            </summary>
+        </member>
+        <member name="M:Manos.IO.IBaseWatcher.Start">
+            <summary>
+            Start the watcher.
+            </summary>
+        </member>
+        <member name="M:Manos.IO.IBaseWatcher.Stop">
+            <summary>
+            Stop the watcher.
+            </summary>
+        </member>
+        <member name="P:Manos.IO.IBaseWatcher.IsRunning">
+            <summary>
+            Gets a value indicating whether this watcher is running.
+            </summary>
+            <value>
+            <c>true</c> if this instance is running and may receive callbacks; otherwise, <c>false</c>.
+            </value>
+        </member>
+        <member name="T:Manos.IO.IPrepareWatcher">
+            <summary>
+            Prepare watchers are invoked before any other watchers.
+            <para>Corresponding event: event loop woken up by some other event</para>
+            </summary>
+        </member>
+        <member name="T:Manos.IO.ICheckWatcher">
+            <summary>
+            Check watchers are invoked after all other watchers.
+            <para>Corresponding event: event loop about to enter resting state</para>
+            </summary>
+        </member>
+        <member name="T:Manos.IO.IAsyncWatcher">
+            <summary>
+            Async watchers to signal an event in a threadsafe manner and
+            wake the loop the watcher belongs to.
+            This is an instance of a watche that may meld multiple event
+            occurences into one calling.
+            <para>Corresponding event: the <see cref="M:Manos.IO.IAsyncWatcher.Send"/> method of this
+            watcher was called at least once.</para>
+            </summary>
+        </member>
+        <member name="M:Manos.IO.IAsyncWatcher.Send">
+            <summary>
+            Send a signal to the watcher, waking up the watcher's event
+            loop if necessary to allow callback invocation. After or
+            during the callback invocation, the watcher can be signalled again.
+            </summary>
+        </member>
+        <member name="T:Manos.IO.ITimerWatcher">
+            <summary>
+            Timer watchers represent recurring timer events.
+            <para>Corresponding event: the initial timeout has passed, or the
+            repeat timeout has passed.</para>
+            </summary>
+        </member>
+        <member name="M:Manos.IO.ITimerWatcher.Again">
+            <summary>
+            Rearm the timer with the interval specified in <see cref="P:Manos.IO.ITimerWatcher.Repeat"/>.
+            </summary>
+        </member>
+        <member name="P:Manos.IO.ITimerWatcher.Repeat">
+            <summary>
+            Gets or sets the interval at which the watcher callback should
+            be invoked. Changing this value need not immediatly restart the
+            timeout, use the <see cref="M:Manos.IO.ITimerWatcher.Again"/> method for that.
+            </summary>
+        </member>
+        <member name="T:Manos.IO.IIdleWatcher">
+            <summary>
+            Idle watchers are invoked on every loop iteration without
+            waiting for external events. Thus, one continuously active
+            idle watcher will cause the event loop never enter a resting
+            state.
+            <para>Corresponding event: none. The idle watcher just executes
+            whenever it can.</para>
+            </summary>
+        </member>
+        <member name="T:Manos.IO.Context">
+            <summary>
+            Represent an IO context.
+            <para>An IO context contains an event loop that is woken whenever
+            something of interest happens in structes spawned by the context, i.e.
+            a socket has new data to be read or another thread has signalled this
+            context.</para>
+            <para>Every context is able to spawn watchers, sockets, and streams that
+            are said to be bound to the context. Events on the spawned structures are
+            processed by the context event loop. Spawned structures cannot move between
+            contexts.</para>
+            </summary>
+        </member>
+        <member name="M:Manos.IO.Context.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Manos.IO.Context"/> class.
+            </summary>
+        </member>
+        <member name="M:Manos.IO.Context.Finalize">
+            <summary>
+            Releases unmanaged resources and performs other cleanup operations before the <see cref="T:Manos.IO.Context"/> is
+            reclaimed by garbage collection.
+            </summary>
+        </member>
+        <member name="M:Manos.IO.Context.Create">
+            <summary>
+            Create a new IO context. The actual type of the context may vary
+            depending on the operating system used to execute the program.
+            </summary>
+        </member>
+        <member name="M:Manos.IO.Context.Dispose">
+            <summary>
+            Releases all resource used by the <see cref="T:Manos.IO.Context"/> object.
+            </summary>
+            <remarks>
+            Call <see cref="M:Manos.IO.Context.Dispose"/> when you are finished using the <see cref="T:Manos.IO.Context"/>. The
+            <see cref="M:Manos.IO.Context.Dispose"/> method leaves the <see cref="T:Manos.IO.Context"/> in an unusable state. After calling
+            <see cref="M:Manos.IO.Context.Dispose"/>, you must release all references to the <see cref="T:Manos.IO.Context"/> so the garbage
+            collector can reclaim the memory that the <see cref="T:Manos.IO.Context"/> was occupying.
+            </remarks>
+        </member>
+        <member name="M:Manos.IO.Context.Dispose(System.Boolean)">
+            <summary>
+            Dispose the current instance.
+            </summary>
+            <param name="disposing">
+            <c>true</c>, if the method was called by <see cref="M:Manos.IO.Context.Dispose"/>,
+            <c>false</c> if it was called from a finalizer.
+            </param>
+        </member>
+        <member name="M:Manos.IO.Context.Start">
+            <summary>
+            Start the event loop. The context will leave this method only when
+            forced to by a call to <see cref="M:Manos.IO.Context.Stop"/>. When no events are pending,
+            the loop will enter a resting state.
+            </summary>
+        </member>
+        <member name="M:Manos.IO.Context.RunOnce">
+            <summary>
+            Runs the event loop iteration once. If no events are currently pending,
+            the context will wait for events to process and block in the meantime.
+            </summary>
+        </member>
+        <member name="M:Manos.IO.Context.RunOnceNonblocking">
+            <summary>
+            Runs the event loop once, with blocking. If no events are pending, this
+            method returns immediatly. Otherwise, all pending events are processed,
+            then the method returns.
+            </summary>
+        </member>
+        <member name="M:Manos.IO.Context.Stop">
+            <summary>
+            Stop the event loop. This forces a prior call to <see cref="M:Manos.IO.Context.Start"/> to
+            return control to the caller.
+            </summary>
+        </member>
+        <member name="M:Manos.IO.Context.CreateTimerWatcher(System.TimeSpan,System.TimeSpan,System.Action)">
+            <summary>
+            Creates a new timer watcher. The created watcher will first fire after
+            <paramref name="timeout"/> has elapsed, then periodically with period
+            <paramref name="repeat"/>.
+            </summary>
+            <returns>
+            The timer watcher.
+            </returns>
+            <param name="timeout">
+            Timeout after which the first callback invocation occurs.
+            </param>
+            <param name="repeat">
+            Repeat interval after which all successive callback invocations occur.
+            </param>
+            <param name="cb">
+            Callback to invoke for every timer event.
+            </param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="c"/> is <c>null</c></exception>
+        </member>
+        <member name="M:Manos.IO.Context.CreateTimerWatcher(System.TimeSpan,System.Action)">
+            <summary>
+            Creates a new timer watcher. The created watcher will first fire after
+            <paramref name="timeout"/> has elapsed, then periodically with period
+            <paramref name="timeout"/>.
+            </summary>
+            <returns>
+            The timer watcher.
+            </returns>
+            <param name="timeout">
+            Timeout after which the first callback invocation occurs, and the period
+            after which all successive callback invocations occur.
+            </param>
+            <param name="cb">
+            Callback to invoke for every timer event.
+            </param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="c"/> is <c>null</c></exception>
+        </member>
+        <member name="M:Manos.IO.Context.CreateAsyncWatcher(System.Action)">
+            <summary>
+            Creates a new async watcher.
+            </summary>
+            <returns>
+            The async watcher.
+            </returns>
+            <param name="cb">
+            Callback to invoke at least once for a number of signals received by the watcher.
+            </param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="c"/> is <c>null</c></exception>
+        </member>
+        <member name="M:Manos.IO.Context.CreatePrepareWatcher(System.Action)">
+            <summary>
+            Creates a new prepare watcher. The watcher callback will be executed prior to
+            every other watcher callback per loop iteration.
+            </summary>
+            <returns>
+            The prepare watcher.
+            </returns>
+            <param name="cb">
+            Callback to invoke per loop iteration.
+            </param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="c"/> is <c>null</c></exception>
+        </member>
+        <member name="M:Manos.IO.Context.CreateCheckWatcher(System.Action)">
+            <summary>
+            Creates a new check watcher. The watcher callback will be executed after
+            every other watcher callback per loop iteration.
+            </summary>
+            <returns>
+            The check watcher.
+            </returns>
+            <param name="cb">
+            Callback to invoke per loop iteration.
+            </param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="c"/> is <c>null</c></exception>
+        </member>
+        <member name="M:Manos.IO.Context.CreateIdleWatcher(System.Action)">
+            <summary>
+            Creates a new idle watcher. The watcher callback will be executed once per loop iteration.
+            An active idle watcher will prevent the loop from entering a resting state.
+            </summary>
+            <returns>
+            The idle watcher.
+            </returns>
+            <param name="cb">
+            Callback to invoke per loop iteration.
+            </param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="c"/> is <c>null</c></exception>
+        </member>
+        <member name="M:Manos.IO.Context.CreateSocket">
+            <summary>
+            Creates a new socket. The socket is initially invalid.
+            </summary>
+            <returns>
+            The socket.
+            </returns>
+        </member>
+        <member name="M:Manos.IO.Context.CreateSecureSocket(System.String,System.String)">
+            <summary>
+            Creates a new secure socket. The socket is initially invalid.
+            Currently, only listening operations are supported by secure sockets.
+            Some operating systems do not support secure sockets at all yet.
+            </summary>
+            <returns>
+            The secure socket.
+            </returns>
+            <param name='certFile'>
+            Cert file in PEM format, must contain a valid X.509 server certificate.
+            </param>
+            <param name='keyFile'>
+            Key file in PEM format, must contain a private key for the certificate.
+            </param>
+        </member>
+        <member name="M:Manos.IO.Context.OpenFile(System.String,System.IO.FileAccess,System.Int32)">
+            <summary>
+            Opens a file for asynchronous operations.
+            </summary>
+            <returns>
+            An asynchronous stream for the given file.
+            </returns>
+            <param name='fileName'>
+            File name.
+            </param>
+            <param name='openMode'>
+            Open mode.
+            </param>
+            <param name='blockSize'>
+            Block size to use for operations on the file. Larger block sizes generally improve
+            performance, though too large block sizes only use more memory.
+            </param>
+        </member>
+        <member name="M:Manos.IO.Context.CreateFile(System.String,System.Int32)">
+            <summary>
+            Opens a file for asynchronous operations, creating it if it does not exist yet.
+            </summary>
+            <returns>
+            An asynchronous stream for the given file.
+            </returns>
+            <param name='fileName'>
+            File name.
+            </param>
+            <param name='blockSize'>
+            Block size to use for operations on the file. Larger block sizes generally improve
+            performance, though too large block sizes only use more memory.
+            </param>
+        </member>
+    </members>
+</doc>
