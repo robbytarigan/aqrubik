@@ -8,7 +8,7 @@
     <ProjectGuid>{DE15CC95-2B63-4608-AAC2-C16AB0DE0E65}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Aqrubik.Web.Web</RootNamespace>
+    <RootNamespace>Aqrubik.Web</RootNamespace>
     <AssemblyName>Aqrubik.Web</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>

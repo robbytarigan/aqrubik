@@ -12,17 +12,18 @@
 namespace Aqrubik.Web
 {
     using System;
-    using System.Collections.Generic;    
+    using System.Collections.Generic;
+    using System.Linq;
     using System.Text;
     
-    //[System.CodeDom.Compiler.GeneratedCodeAttribute("RazorGenerator", "1.1.2.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("RazorGenerator", "1.1.2.0")]
     internal partial class RazorTemplate : RazorTemplateBase
     {
 #line hidden
 
         #line 2 "E:\RobbyData\Project\GitHome\aqrubik\src\Aqrubik.Web\RazorTemplate.cshtml"
 
-    public string Model { get; set; }
+    public dynamic Model { get; set; }
 
         #line default
         #line hidden
