@@ -5,11 +5,8 @@
     using System.Linq;
     using System.Text;
     #endregion Using
-    public class Rubik {
-        private int[] cubes = new int[27];
-
-        public int[] Cubes {
-            get { return cubes; }
-        }
+    public class Cube {
+        private byte color;
+        
     }
 }
