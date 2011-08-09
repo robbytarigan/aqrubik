@@ -10,14 +10,14 @@
     /// </summary>
     public class Cube {
         private readonly Color color;
-        private Face position;
+        //private Face position;
 
-        public Cube(Color color, Face currentPosition) {
+        public Cube(Color color) {
             this.color = color;
-            this.position = currentPosition;
+            //this.position = currentPosition;
         }
 
         public Color Color { get { return color; }  }
-        public Face Position { get { return position; } set { position = value; } }
+        //public Face Position { get { return position; } set { position = value; } }
     }
 }
