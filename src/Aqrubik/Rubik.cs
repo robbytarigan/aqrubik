@@ -1,9 +1,6 @@
 ﻿namespace Aqrubik {
     #region Using
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
     #endregion Using
     /// <summary>
     /// Represents a rubik which contains 27 cubes, which one in the core center and 6 on the center of six surfaces.
@@ -41,8 +38,17 @@
             cubes[26] = new Cube(Color.Green | Color.Red    | Color.White);           
         }
 
-        public Cube[] Cubes {
-            get { return cubes; }
+        //public Cube[] Cubes {
+        //    get { return cubes; }
+        //}
+
+        public Cube this[int positionIndex] {
+            get {
+                if (positionIndex < 0 || positionIndex > 26)
+                    throw new ArgumentOutOfRangeException("positionIndex");
+
+                return cubes[positionIndex];
+            }
         }
 
         private static void Rotate(Cube[] sideCubes, Movement movement) {
